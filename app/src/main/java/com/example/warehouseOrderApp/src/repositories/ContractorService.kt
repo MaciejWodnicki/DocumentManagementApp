@@ -1,16 +1,14 @@
-package com.example.warehouseOrderApp.src.repository
+package com.example.warehouseOrderApp.src.repositories
 
 import com.example.warehouseOrderApp.src.data.Contractor
 
 object ContractorService {
     private var contractorList: MutableList<Contractor> = mutableListOf()
 
-    fun addContractor(symbol:String, name:String){
-        var newContractor:Contractor = Contractor(symbol,name)
-
-        if (!contractorList.contains(newContractor)){
-            contractorList.add(newContractor)
-        }
+    fun addContractor(contractor: Contractor?){
+        if(contractor == null)
+            return
+        contractorList.add(contractor)
     }
     fun listOfContractors(): MutableList<Contractor> {
         return contractorList

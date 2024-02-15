@@ -33,7 +33,7 @@ fun DocumentEntry() {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { presses++ }) {
+            FloatingActionButton(onClick = {  }) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
@@ -51,7 +51,7 @@ fun DocumentEntry() {
 
                     It also contains some basic inner content, such as this text.
 
-                    You have pressed the floating action button $presses times.
+                    You have pressed the floating action button times.
                 """.trimIndent(),
             )
         }

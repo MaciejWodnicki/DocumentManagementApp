@@ -4,5 +4,7 @@ enum class Routes {
     MainMenu,
     DocumentList,
     DocumentInfo,
-    Contractors
+    Contractors,
+    ContractorEdit,
+    DocumentEdit
 }

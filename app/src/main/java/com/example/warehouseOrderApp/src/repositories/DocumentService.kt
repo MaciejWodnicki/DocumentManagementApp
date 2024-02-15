@@ -1,4 +1,4 @@
-package com.example.warehouseOrderApp.src.repository
+package com.example.warehouseOrderApp.src.repositories
 
 import com.example.warehouseOrderApp.src.data.Contractor
 import com.example.warehouseOrderApp.src.data.Document

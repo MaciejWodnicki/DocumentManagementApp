@@ -1,18 +1,33 @@
 package com.example.warehouseOrderApp.src.data
 
-class Contractor(symbol: String, name:String) {
+class Contractor(symbol: String = "", name:String = "") {
 
-    private var name = name
-        get(){
-            return field
-        }
-    private var symbol = symbol
-        get() = field
+    var name = name
+        private set
+    var symbol = symbol
+        private set
+
 
     fun updateContractor(contractorSymbol: String = symbol, contractorName:String = name) {
         symbol = contractorSymbol
         name = contractorName
     }
 
+    override fun toString(): String {
+        return "$name&$symbol"
+    }
 
+
+
+
+}
+fun fromString(string: String?): Contractor {
+    if (string == null){
+        return Contractor()
+    }
+
+    return Contractor(
+        string.substringBefore("&"),
+        string.substringAfter("&")
+    )
 }

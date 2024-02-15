@@ -17,14 +17,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.warehouseOrderApp.src.data.Contractor
-import com.example.warehouseOrderApp.src.repository.DocumentService
+import com.example.warehouseOrderApp.src.repositories.DocumentService
 import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentList() {
+fun DocumentList(navController: NavHostController) {
 
     var documentService:DocumentService = DocumentService
     documentService.addDocument("FVS/wqeqw/21412", LocalDate.of(2022,12,25), Contractor("FVS/123/3241","Joe Silver"))
@@ -42,7 +43,7 @@ fun DocumentList() {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { presses++ }) {
+            FloatingActionButton(onClick = { }) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
