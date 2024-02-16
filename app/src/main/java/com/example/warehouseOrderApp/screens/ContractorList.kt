@@ -38,10 +38,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.warehouseOrderApp.src.data.Routes
-import com.example.warehouseOrderApp.src.repositories.ContractorService
+import com.example.warehouseOrderApp.src.repositories.ContractorsService
 
-var addActionActive = false
-val contractorService:ContractorService = ContractorService
+private var addActionActive = false
+private val contractorService:ContractorsService = ContractorsService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +78,7 @@ fun ContractorList(navController: NavHostController) {
             itemsIndexed(contractorService.listOfContractors()){index, item ->
                 Column (modifier = Modifier,
                     ){
-                    ContractorEntry(index, navController)
+                    ContractorListing(index, navController)
                 }
             }
 
@@ -92,9 +92,9 @@ fun ContractorList(navController: NavHostController) {
 
 }
 @Composable
-fun ContractorEntry(index: Int, navController:NavController){
+fun ContractorListing(index: Int, navController:NavController){
 
-    val contractor = ContractorService.data(index)
+    val contractor = ContractorsService.get(index)
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
@@ -124,7 +124,7 @@ fun ContractorEdit(index: Int?,
     if(index == null) return
 
 
-    val contractor = contractorService.data(index)
+    val contractor = contractorService.get(index)
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 40.dp)
@@ -153,7 +153,7 @@ fun ContractorEdit(index: Int?,
 
         ElevatedButton(onClick = {
             contractor.updateContractor(symbol,name)
-            navController.navigate(Routes.Contractors.name)
+            navController.popBackStack()
         }) {
             Text(text = "Confirm")
         }

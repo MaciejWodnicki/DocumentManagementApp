@@ -13,4 +13,9 @@ class Contractor(symbol: String = "", name:String = "") {
         name = contractorName
     }
 
+    override
+    fun toString(): String{
+        return "Name: $name, Symbol: $symbol"
+    }
+
 }

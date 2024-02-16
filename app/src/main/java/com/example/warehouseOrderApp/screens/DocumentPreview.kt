@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentEntry() {
+fun DocumentListing() {
     Scaffold(
         topBar = {
             TopAppBar(

@@ -2,7 +2,7 @@ package com.example.warehouseOrderApp.src.repositories
 
 import com.example.warehouseOrderApp.src.data.Contractor
 
-object ContractorService {
+object ContractorsService {
     private var contractorList: MutableList<Contractor> = mutableListOf()
 
     fun addContractor(contractor: Contractor?){
@@ -14,7 +14,7 @@ object ContractorService {
         return contractorList
     }
 
-    fun data(index:Int): Contractor {
+    fun get(index:Int): Contractor {
         return contractorList[index]
     }
 

@@ -1,14 +1,13 @@
 package com.example.warehouseOrderApp.src.repositories
 
-import com.example.warehouseOrderApp.src.data.Contractor
 import com.example.warehouseOrderApp.src.data.Document
 import java.time.LocalDate
 
-object DocumentService {
+object DocumentsService {
     private var documentList: MutableList<Document> = mutableListOf()
 
-    fun addDocument(symbol:String, date: LocalDate, contractor: Contractor){
-        var newDocument: Document = Document(symbol, date, contractor)
+    fun addDocument(symbol:String, date: LocalDate, contractorId: Int){
+        var newDocument: Document = Document(symbol, date, contractorId)
 
         if (!documentList.contains(newDocument)){
             documentList.add(newDocument)
@@ -20,6 +19,12 @@ object DocumentService {
 
     fun data(index:Int): Document {
         return documentList[index]
+    }
+
+    fun availableIndex(): Int{
+        val index:Int = documentList.size
+        documentList.add(index, Document())
+        return index
     }
 
 }
