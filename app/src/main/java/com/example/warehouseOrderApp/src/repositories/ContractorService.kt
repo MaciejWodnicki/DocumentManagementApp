@@ -18,4 +18,10 @@ object ContractorService {
         return contractorList[index]
     }
 
+    fun availableIndex(): Int{
+        val index:Int = contractorList.size
+        contractorList.add(index, Contractor())
+        return index
+    }
+
 }

@@ -13,21 +13,4 @@ class Contractor(symbol: String = "", name:String = "") {
         name = contractorName
     }
 
-    override fun toString(): String {
-        return "$name&$symbol"
-    }
-
-
-
-
-}
-fun fromString(string: String?): Contractor {
-    if (string == null){
-        return Contractor()
-    }
-
-    return Contractor(
-        string.substringBefore("&"),
-        string.substringAfter("&")
-    )
 }

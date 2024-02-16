@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -27,7 +27,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.example.warehouseOrderApp.src.data.Contractor
 import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.repositories.ContractorService
 
@@ -49,12 +47,9 @@ val contractorService:ContractorService = ContractorService
 @Composable
 fun ContractorList(navController: NavHostController) {
 
+    val addActionState = remember { mutableStateOf(addActionActive) }
 
-    val addActionState = remember {
-        mutableStateOf(addActionActive)
-    }
     Scaffold(
-
         topBar = {
             CenterAlignedTopAppBar(
                 colors = topAppBarColors(
@@ -80,24 +75,26 @@ fun ContractorList(navController: NavHostController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(contractorService.listOfContractors()){contractor ->
+            itemsIndexed(contractorService.listOfContractors()){index, item ->
                 Column (modifier = Modifier,
                     ){
-                    ContractorEntry(contractor = contractor, navController)
+                    ContractorEntry(index, navController)
                 }
             }
 
         }
         if (addActionState.value){
-            navController.navigate("${Routes.ContractorEdit.name}?contractor={${Contractor()}}")
+            navController.navigate(
+                "${Routes.ContractorEdit.name}/${contractorService.availableIndex()}")
             addActionState.value = false
         }
     }
 
 }
 @Composable
-fun ContractorEntry(contractor: Contractor, navController:NavController){
-    // Add padding around our message
+fun ContractorEntry(index: Int, navController:NavController){
+
+    val contractor = ContractorService.data(index)
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
@@ -105,14 +102,13 @@ fun ContractorEntry(contractor: Contractor, navController:NavController){
     ) {
         Column {
             Text(text = contractor.name)
-            // Add a vertical space between the author and message texts
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = contractor.symbol)
             Divider(color = MaterialTheme.colorScheme.primary)
         }
         Button(onClick = {
             navController.navigate(
-                "${Routes.ContractorEdit.name}?contractor={${contractor.toString()}}")},
+                "${Routes.ContractorEdit.name}/$index")},
             modifier = Modifier.background(color = Color.Red)
         ) {
             Icons.Default.Edit
@@ -122,9 +118,13 @@ fun ContractorEntry(contractor: Contractor, navController:NavController){
 }
 
 @Composable
-fun ContractorEdit(contractor: Contractor = Contractor(),
+fun ContractorEdit(index: Int?,
                    navController: NavController) {
 
+    if(index == null) return
+
+
+    val contractor = contractorService.data(index)
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 40.dp)
@@ -153,11 +153,11 @@ fun ContractorEdit(contractor: Contractor = Contractor(),
 
         ElevatedButton(onClick = {
             contractor.updateContractor(symbol,name)
-            contractorService.addContractor(contractor)
             navController.navigate(Routes.Contractors.name)
         }) {
-            Text(text = "Confirm Changes")
+            Text(text = "Confirm")
         }
     }
 
 }
+

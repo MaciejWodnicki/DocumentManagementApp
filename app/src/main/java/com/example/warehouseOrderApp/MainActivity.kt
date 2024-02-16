@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,10 +13,7 @@ import com.example.warehouseOrderApp.screens.ContractorEdit
 import com.example.warehouseOrderApp.screens.ContractorList
 import com.example.warehouseOrderApp.screens.DocumentList
 import com.example.warehouseOrderApp.screens.MainMenu
-import com.example.warehouseOrderApp.src.data.Contractor
 import com.example.warehouseOrderApp.src.data.Routes
-import com.example.warehouseOrderApp.src.data.fromString
-import java.lang.reflect.Type
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,14 +40,13 @@ fun NavHostBuilder(){
         composable(route = Routes.DocumentList.name){
             DocumentList(navController)
         }
-        composable(route = "${Routes.ContractorEdit.name}?contractor={contractor}",
-            arguments = listOf(navArgument("contractor"){
-                type = NavType.StringType
+        composable(route = "${Routes.ContractorEdit.name}/{index}",
+            arguments = listOf(navArgument("index"){
+                type = NavType.IntType
             })
         ){
-            val arg = it.arguments?.getString("contractor")
-            val contractor = fromString(arg)
-            ContractorEdit(contractor = contractor, navController)
+            val index = it.arguments?.getInt("index")
+            ContractorEdit(index, navController)
         }
         composable(route = Routes.DocumentEdit.name){
 
