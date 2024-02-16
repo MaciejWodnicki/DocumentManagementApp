@@ -1,5 +1,7 @@
 package com.example.warehouseOrderApp.screens
 
+import android.R
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
@@ -35,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.warehouseOrderApp.src.data.Routes
@@ -98,21 +104,26 @@ fun ContractorListing(index: Int, navController:NavController){
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
             Text(text = contractor.name)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = contractor.symbol)
-            Divider(color = MaterialTheme.colorScheme.primary)
         }
         Button(onClick = {
             navController.navigate(
                 "${Routes.ContractorEdit.name}/$index")},
-            modifier = Modifier.background(color = Color.Red)
         ) {
-            Icons.Default.Edit
+            Icon(
+                Icons.Rounded.Edit,
+                contentDescription = stringResource(id = R.string.untitled)
+            )
         }
+    }
+    Row {
+        Divider(color = MaterialTheme.colorScheme.primary)
     }
 
 }

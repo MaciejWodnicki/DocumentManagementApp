@@ -18,4 +18,11 @@ class Document (documentSymbol:String = "",
         entryList.add(entry)
     }
 
+    fun update(documentSymbol:String = "",
+                       documentDate: LocalDate = LocalDate.of(2012,12,22),
+                       contractorId: Int = 0){
+        symbol = documentSymbol
+        date = documentDate
+        contractor = contractorId
+    }
 }

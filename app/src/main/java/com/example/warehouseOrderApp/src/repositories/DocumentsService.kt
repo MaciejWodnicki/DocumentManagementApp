@@ -17,7 +17,7 @@ object DocumentsService {
         return documentList
     }
 
-    fun data(index:Int): Document {
+    fun get(index:Int): Document {
         return documentList[index]
     }
 
