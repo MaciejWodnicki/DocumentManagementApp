@@ -3,8 +3,20 @@ package com.example.warehouseOrderApp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.DurationBasedAnimationSpec
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavArgument
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,7 +43,15 @@ fun NavHostBuilder() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = Routes.MainMenu.name
+        startDestination = Routes.MainMenu.name,
+
+
+        enterTransition = {
+            slideInHorizontally (animationSpec = spring(stiffness = Spring.StiffnessLow)){ it->it }
+        },
+        popEnterTransition = {
+            slideInHorizontally (animationSpec = spring(stiffness = Spring.StiffnessLow)) { it -> -it }
+        }
     ) {
         composable(route = Routes.MainMenu.name) {
             MainMenu(navController)
