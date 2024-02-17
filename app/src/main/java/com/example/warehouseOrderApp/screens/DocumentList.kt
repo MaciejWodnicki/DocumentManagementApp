@@ -51,6 +51,7 @@ import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.repositories.ContractorsService
 import com.example.warehouseOrderApp.src.repositories.DocumentsService
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 
 
 private val documentService: DocumentsService = DocumentsService
@@ -152,7 +153,7 @@ fun DocumentEdit(
 
 
     val document = documentService.get(index)
-
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 40.dp)
@@ -208,7 +209,15 @@ fun DocumentEdit(
             if(symbol == "" || contractorId == -1){
                 documentService.removeDocument(index)
             }else{
-                document.update(symbol, LocalDate.parse(date), contractorId)
+                var parsedDate = document.date
+                try {
+                    parsedDate = LocalDate.parse(date)
+                    document.update(symbol, parsedDate, contractorId)
+                }catch (e: DateTimeParseException){
+                    Toast.makeText(context,"Niepoprawna data",Toast.LENGTH_SHORT).show()
+                    documentService.removeDocument(index)
+                }
+
             }
             navController.popBackStack()
         }) {

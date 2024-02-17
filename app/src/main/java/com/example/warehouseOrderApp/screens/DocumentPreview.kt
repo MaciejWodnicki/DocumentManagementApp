@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentListing() {
+fun DocumentPreview() {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -28,7 +28,7 @@ fun DocumentListing() {
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text(text = "Document List")
+                    Text(text = "Dokument")
                 }
             )
         },
