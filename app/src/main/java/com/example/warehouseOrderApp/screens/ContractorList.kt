@@ -67,8 +67,8 @@ fun ContractorList(navController: NavHostController) {
         ExtendedFloatingActionButton(onClick = {
             addActionState.value = true
         }) {
-            Icon(Icons.Default.Add, contentDescription = "Add")
-            Text(text = "Add")
+            Icon(Icons.Default.Add, contentDescription = "Dodaj")
+            Text(text = "Dodaj")
         }
     }) { innerPadding ->
         LazyColumn(
@@ -146,7 +146,9 @@ fun ContractorEdit(
     ) {
         var name by remember { mutableStateOf(contractor.name) }
 
-        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
+        OutlinedTextField(value = name,
+            onValueChange = { name = it },
+            label = { Text("Nazwa") })
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -165,11 +167,13 @@ fun ContractorEdit(
             }
             navController.popBackStack()
         }) {
-            Text(text = "Confirm")
+            Text(text = "Zatwierdź")
         }
 
         BackHandler() {
-            contractorService.removeContractor(index)
+            if (symbol == "" || name == "") {
+                contractorService.removeContractor(index)
+            }
             navController.popBackStack()
         }
     }

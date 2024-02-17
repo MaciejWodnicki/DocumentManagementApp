@@ -1,5 +1,5 @@
 package com.example.warehouseOrderApp.src.data
 
-enum class Unit {
-    KG, M, L
+enum class UnitOfMeasure {
+    KG, M, L, U,
 }

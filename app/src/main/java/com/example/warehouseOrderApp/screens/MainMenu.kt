@@ -12,8 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.rounded.AccountBox
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.LinearGradientShader
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,7 +43,7 @@ fun MainMenu(navController: NavController) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(Color(0xFFcdbbd7), Color(0xFF91ace4))
+                    listOf(MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.inversePrimary)
                 )
             )
             .padding(horizontal = 10.dp, vertical = 70.dp),
@@ -52,7 +58,7 @@ fun MainMenu(navController: NavController) {
 
 @Composable
 fun MenuButton(text: String, navController: NavController, destination: String) {
-    Button(
+    ElevatedButton(
         onClick = {
             navController.navigate(destination)
         },
@@ -62,16 +68,16 @@ fun MenuButton(text: String, navController: NavController, destination: String) 
             .padding(0.dp, 5.dp)
             .fillMaxWidth()
             .height(250.dp),
-        colors = ButtonDefaults.buttonColors(Color(0xFFD5D5D5)),
-        border = BorderStroke(1.dp, Color.Black),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSecondary),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
 
 
         ) {
         Text(
             text = text,
-            fontSize = 50.sp,
-            color = Color.Black,
-            fontFamily = FontFamily.Serif,
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+            color = MaterialTheme.colorScheme.scrim,
+            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
             textAlign = TextAlign.Center,
             lineHeight = 50.sp
         )

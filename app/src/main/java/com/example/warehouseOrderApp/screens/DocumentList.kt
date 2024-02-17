@@ -3,6 +3,7 @@ package com.example.warehouseOrderApp.screens
 import android.R
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -41,12 +44,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.warehouseOrderApp.src.data.Contractor
+import com.example.warehouseOrderApp.src.data.Document
 import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.repositories.ContractorsService
 import com.example.warehouseOrderApp.src.repositories.DocumentsService
@@ -113,40 +122,38 @@ fun DocumentList(navController: NavHostController) {
 fun DocumentListing(index: Int, navController: NavController) {
 
     val document = documentService.get(index)
+
+
     Row(
         modifier = Modifier
             .padding(top = 16.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                navController.navigate("${Routes.DocumentPreview.name}/$index")
+            },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
             Text(text = document.symbol)
+            if (contractorService.listOfContractors().size > document.contractor &&
+                document.contractor >= 0
+            ) {
+                Text(text = contractorService.listOfContractors()[document.contractor].name)
+            }
         }
 
-        Column {
-            Text(
-                text = document.date.toString(),
-            )
-        }
+        Text(text = document.date.toString())
 
-    }
-    Row {
-        if (contractorService.listOfContractors().size > document.contractor &&
-            document.contractor >= 0
-        ) {
-            Text(text = contractorService.listOfContractors()[document.contractor].name)
-        }
     }
     Row {
         Divider(color = MaterialTheme.colorScheme.primary)
     }
-
 }
 
 @Composable
 fun DocumentEdit(
     index: Int?,
-    navController: NavController
+    navController: NavController,
 ) {
 
     if (index == null || index >= documentService.listOfDocuments().size) return
@@ -185,7 +192,7 @@ fun DocumentEdit(
         var contractorId by remember { mutableStateOf(document.contractor) }
 
         Row {
-            contractorId = searchableExposedDropdownMenuBox()
+            contractorId = searchableExposedDropdownMenuBox(document)
             Button(
                 onClick = {
                     navController.navigate(
@@ -206,15 +213,15 @@ fun DocumentEdit(
 
         ElevatedButton(onClick = {
 
-            if(symbol == "" || contractorId == -1){
+            if (symbol == "" || contractorId == -1) {
                 documentService.removeDocument(index)
-            }else{
+            } else {
                 var parsedDate = document.date
                 try {
                     parsedDate = LocalDate.parse(date)
                     document.update(symbol, parsedDate, contractorId)
-                }catch (e: DateTimeParseException){
-                    Toast.makeText(context,"Niepoprawna data",Toast.LENGTH_SHORT).show()
+                } catch (e: DateTimeParseException) {
+                    Toast.makeText(context, "Niepoprawna data", Toast.LENGTH_SHORT).show()
                     documentService.removeDocument(index)
                 }
 
@@ -224,7 +231,9 @@ fun DocumentEdit(
             Text(text = "Confirm")
         }
         BackHandler() {
-            documentService.removeDocument(index)
+            if (symbol == "" || contractorId == -1) {
+                documentService.removeDocument(index)
+            }
             navController.popBackStack()
         }
     }
@@ -232,13 +241,13 @@ fun DocumentEdit(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun searchableExposedDropdownMenuBox(): Int {
+fun searchableExposedDropdownMenuBox(document: Document): Int {
     val contractors = contractorService.listOfContractors()
 
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }
 
-    var contractorId: Int by remember { mutableStateOf(-1) }
+    var contractorId: Int by remember { mutableStateOf(document.contractor) }
 
     Box(
         modifier = Modifier
@@ -257,8 +266,6 @@ fun searchableExposedDropdownMenuBox(): Int {
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor()
             )
-
-
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = {}

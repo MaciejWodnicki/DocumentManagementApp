@@ -3,20 +3,10 @@ package com.example.warehouseOrderApp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.DurationBasedAnimationSpec
-import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,6 +16,9 @@ import com.example.warehouseOrderApp.screens.ContractorEdit
 import com.example.warehouseOrderApp.screens.ContractorList
 import com.example.warehouseOrderApp.screens.DocumentEdit
 import com.example.warehouseOrderApp.screens.DocumentList
+import com.example.warehouseOrderApp.screens.DocumentPreview
+import com.example.warehouseOrderApp.screens.EntryEdit
+import com.example.warehouseOrderApp.screens.EntryPreview
 import com.example.warehouseOrderApp.screens.MainMenu
 import com.example.warehouseOrderApp.src.data.Routes
 
@@ -78,6 +71,39 @@ fun NavHostBuilder() {
         ) {
             val index = it.arguments?.getInt("index")
             DocumentEdit(index, navController)
+        }
+        composable(route = "${Routes.DocumentPreview.name}/{index}",
+            arguments = listOf(navArgument("index") {
+                type = NavType.IntType
+            })
+        ) {
+            val index = it.arguments?.getInt("index")
+            DocumentPreview(index!!, navController)
+        }
+        composable(route = "${Routes.EntryEdit.name}/{index}/{entryIndex}",
+            arguments = listOf(navArgument("index") {
+                type = NavType.IntType
+            },
+            navArgument("entryIndex"){
+                type = NavType.IntType
+            })
+        ) {
+            val index = it.arguments?.getInt("index")
+            val entryIndex = it.arguments?.getInt("entryIndex")
+            EntryEdit(index, entryIndex, navController)
+        }
+
+        composable(route = "${Routes.EntryPreview.name}/{index}/{entryIndex}",
+            arguments = listOf(navArgument("index") {
+                type = NavType.IntType
+            },
+                navArgument("entryIndex"){
+                    type = NavType.IntType
+                })
+        ) {
+            val index = it.arguments?.getInt("index")
+            val entryIndex = it.arguments?.getInt("entryIndex")
+            EntryPreview(index!!, entryIndex!!, navController)
         }
     }
 }
