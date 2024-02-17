@@ -33,7 +33,7 @@ fun DocumentListing() {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {  }) {
+            FloatingActionButton(onClick = { }) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }

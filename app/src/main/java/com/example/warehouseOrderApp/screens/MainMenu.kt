@@ -31,27 +31,31 @@ import com.example.warehouseOrderApp.src.data.Routes
 
 
 @Composable
-fun MainMenu(navController: NavController){
-    Column (
+fun MainMenu(navController: NavController) {
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(
-                listOf(Color(0xFFcdbbd7),Color(0xFF91ace4))))
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFFcdbbd7), Color(0xFF91ace4))
+                )
+            )
             .padding(horizontal = 10.dp, vertical = 70.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
 
-        ){
+        ) {
         MenuButton(text = "Kontrahenci", navController, Routes.Contractors.name)
         MenuButton(text = "Lista Dokumentów", navController, Routes.DocumentList.name)
     }
 }
 
 @Composable
-fun MenuButton(text: String, navController: NavController, destination:String) {
-    Button(onClick = {
-                     navController.navigate(destination)
-    },
+fun MenuButton(text: String, navController: NavController, destination: String) {
+    Button(
+        onClick = {
+            navController.navigate(destination)
+        },
         shape = RoundedCornerShape(15.dp),
         contentPadding = PaddingValues(0.dp, 40.dp),
         modifier = Modifier
@@ -62,12 +66,14 @@ fun MenuButton(text: String, navController: NavController, destination:String) {
         border = BorderStroke(1.dp, Color.Black),
 
 
-    ) {
-        Text(text = text,
+        ) {
+        Text(
+            text = text,
             fontSize = 50.sp,
             color = Color.Black,
             fontFamily = FontFamily.Serif,
             textAlign = TextAlign.Center,
-            lineHeight = 50.sp)
+            lineHeight = 50.sp
+        )
     }
 }

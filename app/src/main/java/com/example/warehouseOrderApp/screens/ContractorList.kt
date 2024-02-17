@@ -2,6 +2,7 @@ package com.example.warehouseOrderApp.screens
 
 import android.R
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,7 +48,7 @@ import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.repositories.ContractorsService
 
 private var addActionActive = false
-private val contractorService:ContractorsService = ContractorsService
+private val contractorService: ContractorsService = ContractorsService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,50 +56,46 @@ fun ContractorList(navController: NavHostController) {
 
     val addActionState = remember { mutableStateOf(addActionActive) }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text("Lista Kontrahentów")
-                }
-            )
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(onClick = {
-                addActionState.value = true
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-                Text(text ="Add")
-            }
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ), title = {
+            Text("Lista Kontrahentów")
+        })
+    }, floatingActionButton = {
+        ExtendedFloatingActionButton(onClick = {
+            addActionState.value = true
+        }) {
+            Icon(Icons.Default.Add, contentDescription = "Add")
+            Text(text = "Add")
         }
-    ) { innerPadding ->
+    }) { innerPadding ->
         LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            itemsIndexed(contractorService.listOfContractors()){index, item ->
-                Column (modifier = Modifier,
-                    ){
+            itemsIndexed(contractorService.listOfContractors()) { index, item ->
+                Column(
+                    modifier = Modifier,
+                ) {
                     ContractorListing(index, navController)
                 }
             }
 
         }
-        if (addActionState.value){
+        if (addActionState.value) {
             navController.navigate(
-                "${Routes.ContractorEdit.name}/${contractorService.availableIndex()}")
+                "${Routes.ContractorEdit.name}/${contractorService.availableIndex()}"
+            )
             addActionState.value = false
         }
     }
 
 }
+
 @Composable
-fun ContractorListing(index: Int, navController:NavController){
+fun ContractorListing(index: Int, navController: NavController) {
 
     val contractor = ContractorsService.get(index)
     Row(
@@ -112,13 +109,15 @@ fun ContractorListing(index: Int, navController:NavController){
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = contractor.symbol)
         }
-        Button(onClick = {
-            navController.navigate(
-                "${Routes.ContractorEdit.name}/$index")},
+        Button(
+            onClick = {
+                navController.navigate(
+                    "${Routes.ContractorEdit.name}/$index"
+                )
+            },
         ) {
             Icon(
-                Icons.Rounded.Edit,
-                contentDescription = stringResource(id = R.string.untitled)
+                Icons.Rounded.Edit, contentDescription = stringResource(id = R.string.untitled)
             )
         }
     }
@@ -129,10 +128,12 @@ fun ContractorListing(index: Int, navController:NavController){
 }
 
 @Composable
-fun ContractorEdit(index: Int?,
-                   navController: NavController) {
+fun ContractorEdit(
+    index: Int?,
+    navController: NavController,
+) {
 
-    if(index == null) return
+    if (index == null || index >= contractorService.listOfContractors().size) return
 
 
     val contractor = contractorService.get(index)
@@ -145,30 +146,34 @@ fun ContractorEdit(index: Int?,
     ) {
         var name by remember { mutableStateOf(contractor.name) }
 
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") }
-        )
+        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
 
         Spacer(modifier = Modifier.height(20.dp))
 
         var symbol by remember { mutableStateOf(contractor.symbol) }
-        OutlinedTextField(
-            value = symbol,
+        OutlinedTextField(value = symbol,
             onValueChange = { symbol = it },
-            label = { Text("Symbol") }
-        )
+            label = { Text("Symbol") })
 
         Spacer(modifier = Modifier.height(20.dp))
 
         ElevatedButton(onClick = {
-            contractor.updateContractor(symbol,name)
+            if (symbol == "" || name == "") {
+                contractorService.removeContractor(index)
+            } else {
+                contractor.updateContractor(symbol, name)
+            }
             navController.popBackStack()
         }) {
             Text(text = "Confirm")
         }
+
+        BackHandler() {
+            contractorService.removeContractor(index)
+            navController.popBackStack()
+        }
     }
+
 
 }
 

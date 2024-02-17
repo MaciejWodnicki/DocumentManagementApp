@@ -2,6 +2,7 @@ package com.example.warehouseOrderApp.screens
 
 import android.R
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,7 +63,7 @@ private val addActionActive = false
 fun DocumentList(navController: NavHostController) {
 
     val addActionState = remember { mutableStateOf(addActionActive) }
-   Scaffold(
+    Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -70,7 +71,7 @@ fun DocumentList(navController: NavHostController) {
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text("Lista Kontrahentów")
+                    Text("Lista Dokumentów")
                 }
             )
         },
@@ -78,8 +79,8 @@ fun DocumentList(navController: NavHostController) {
             ExtendedFloatingActionButton(onClick = {
                 addActionState.value = true
             }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-                Text(text = "Add")
+                Icon(Icons.Default.Add, contentDescription = "Dodaj")
+                Text(text = "Dodaj")
             }
         }
     ) { innerPadding ->
@@ -119,9 +120,6 @@ fun DocumentListing(index: Int, navController: NavController) {
     ) {
         Column {
             Text(text = document.symbol)
-            if(contractorService.listOfContractors().size>document.contractor) {
-                Text(text = contractorService.listOfContractors()[document.contractor].name)
-            }
         }
 
         Column {
@@ -132,15 +130,26 @@ fun DocumentListing(index: Int, navController: NavController) {
 
     }
     Row {
+        if (contractorService.listOfContractors().size > document.contractor &&
+            document.contractor >= 0
+        ) {
+            Text(text = contractorService.listOfContractors()[document.contractor].name)
+        }
+    }
+    Row {
         Divider(color = MaterialTheme.colorScheme.primary)
     }
 
 }
 
 @Composable
-fun DocumentEdit(index: Int?, navController: NavController) {
+fun DocumentEdit(
+    index: Int?,
+    navController: NavController
+) {
 
-    if (index == null) return
+    if (index == null || index >= documentService.listOfDocuments().size) return
+
 
     val document = documentService.get(index)
 
@@ -170,15 +179,18 @@ fun DocumentEdit(index: Int?, navController: NavController) {
             label = { Text("Data") },
             supportingText = { Text("YYYY-MM-DD") },
 
-        )
+            )
 
-        var contractorId by remember { mutableStateOf( document.contractor) }
+        var contractorId by remember { mutableStateOf(document.contractor) }
 
         Row {
             contractorId = searchableExposedDropdownMenuBox()
             Button(
-                onClick = { navController.navigate(
-                    "${Routes.ContractorEdit.name}/${contractorService.availableIndex()}") },
+                onClick = {
+                    navController.navigate(
+                        "${Routes.ContractorEdit.name}/${contractorService.availableIndex()}"
+                    )
+                },
                 modifier = Modifier
                     .padding(vertical = 12.dp, horizontal = 4.dp)
             ) {
@@ -192,11 +204,19 @@ fun DocumentEdit(index: Int?, navController: NavController) {
         Spacer(modifier = Modifier.height(20.dp))
 
         ElevatedButton(onClick = {
+
+            if(symbol == "" || contractorId == -1){
+                documentService.removeDocument(index)
+            }else{
+                document.update(symbol, LocalDate.parse(date), contractorId)
+            }
             navController.popBackStack()
         }) {
-
-            document.update(symbol, LocalDate.parse(date), contractorId)
-            Text(text = "Zatwierdź")
+            Text(text = "Confirm")
+        }
+        BackHandler() {
+            documentService.removeDocument(index)
+            navController.popBackStack()
         }
     }
 }
@@ -209,7 +229,7 @@ fun searchableExposedDropdownMenuBox(): Int {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }
 
-    var contractorId: Int = 0
+    var contractorId: Int by remember { mutableStateOf(-1) }
 
     Box(
         modifier = Modifier
