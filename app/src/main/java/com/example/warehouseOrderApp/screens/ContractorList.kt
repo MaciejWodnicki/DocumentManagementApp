@@ -44,8 +44,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.warehouseOrderApp.src.data.Contractor
 import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.repositories.ContractorsService
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 private var addActionActive = false
 private val contractorService: ContractorsService = ContractorsService
@@ -75,7 +80,11 @@ fun ContractorList(navController: NavHostController) {
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            itemsIndexed(contractorService.listOfContractors()) { index, item ->
+            val currentContractorList: MutableList<Contractor>
+            runBlocking(Dispatchers.IO) {
+                currentContractorList = contractorService.listOfContractors().first()
+            }
+            itemsIndexed(currentContractorList) { index, item ->
                 Column(
                     modifier = Modifier,
                 ) {
@@ -86,7 +95,7 @@ fun ContractorList(navController: NavHostController) {
         }
         if (addActionState.value) {
             navController.navigate(
-                "${Routes.ContractorEdit.name}/${contractorService.availableIndex()}"
+                "${Routes.ContractorEdit.name}/${contractorService.availableIndex(CoroutineName("Contractors view context"))}"
             )
             addActionState.value = false
         }
@@ -97,7 +106,12 @@ fun ContractorList(navController: NavHostController) {
 @Composable
 fun ContractorListing(index: Int, navController: NavController) {
 
-    val contractor = ContractorsService.get(index)
+    val contractor:Contractor
+    try {
+        contractor = ContractorsService.get(index)
+    }catch (exception: IndexOutOfBoundsException){
+        return
+    }
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
@@ -132,8 +146,11 @@ fun ContractorEdit(
     index: Int?,
     navController: NavController,
 ) {
-
-    if (index == null || index >= contractorService.listOfContractors().size) return
+    val currentContractorList: MutableList<Contractor>
+    runBlocking(Dispatchers.IO) {
+        currentContractorList = contractorService.listOfContractors().first()
+    }
+    if (index == null || index >= currentContractorList.size) return
 
 
     val contractor = contractorService.get(index)

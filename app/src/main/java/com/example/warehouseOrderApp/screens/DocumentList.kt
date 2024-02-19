@@ -59,8 +59,15 @@ import com.example.warehouseOrderApp.src.data.Document
 import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.repositories.ContractorsService
 import com.example.warehouseOrderApp.src.repositories.DocumentsService
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
 
 private val documentService: DocumentsService = DocumentsService
@@ -123,7 +130,10 @@ fun DocumentListing(index: Int, navController: NavController) {
 
     val document = documentService.get(index)
 
-
+    val currentContractorList: MutableList<Contractor>
+    runBlocking(Dispatchers.IO) {
+        currentContractorList = contractorService.listOfContractors().first()
+    }
     Row(
         modifier = Modifier
             .padding(top = 16.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
@@ -135,10 +145,10 @@ fun DocumentListing(index: Int, navController: NavController) {
     ) {
         Column {
             Text(text = document.symbol)
-            if (contractorService.listOfContractors().size > document.contractor &&
+            if (currentContractorList.size > document.contractor &&
                 document.contractor >= 0
             ) {
-                Text(text = contractorService.listOfContractors()[document.contractor].name)
+                Text(text = currentContractorList[document.contractor].name)
             }
         }
 
@@ -196,7 +206,7 @@ fun DocumentEdit(
             Button(
                 onClick = {
                     navController.navigate(
-                        "${Routes.ContractorEdit.name}/${contractorService.availableIndex()}"
+                        "${Routes.ContractorEdit.name}/${contractorService.availableIndex(CoroutineName("Document View Context"))}"
                     )
                 },
                 modifier = Modifier
@@ -242,7 +252,10 @@ fun DocumentEdit(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun searchableExposedDropdownMenuBox(document: Document): Int {
-    val contractors = contractorService.listOfContractors()
+    val currentContractorList: MutableList<Contractor>
+    runBlocking(Dispatchers.IO) {
+        currentContractorList = contractorService.listOfContractors().first()
+    }
 
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }
@@ -270,7 +283,7 @@ fun searchableExposedDropdownMenuBox(document: Document): Int {
                 expanded = expanded,
                 onDismissRequest = {}
             ) {
-                contractors.forEachIndexed() { index, item ->
+                currentContractorList.forEachIndexed() { index, item ->
                     DropdownMenuItem(
                         text = { Text(text = "${item.name}, ${item.symbol}") },
                         onClick = {

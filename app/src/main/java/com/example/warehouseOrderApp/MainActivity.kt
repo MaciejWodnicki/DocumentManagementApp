@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.room.Room
 import com.example.warehouseOrderApp.screens.ContractorEdit
 import com.example.warehouseOrderApp.screens.ContractorList
 import com.example.warehouseOrderApp.screens.DocumentEdit
@@ -21,10 +22,15 @@ import com.example.warehouseOrderApp.screens.EntryEdit
 import com.example.warehouseOrderApp.screens.EntryPreview
 import com.example.warehouseOrderApp.screens.MainMenu
 import com.example.warehouseOrderApp.src.data.Routes
+import com.example.warehouseOrderApp.src.room.AppDatabase
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        lateinit var database: AppDatabase
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        database = AppDatabase.getDatabase(applicationContext)
         setContent {
             NavHostBuilder()
         }
