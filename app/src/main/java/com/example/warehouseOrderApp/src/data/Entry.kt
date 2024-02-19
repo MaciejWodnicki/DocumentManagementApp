@@ -5,11 +5,11 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Entry(
+class Entry {
     @ColumnInfo("entry_id")
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0,
-    var name: String = "",
-    var unit: UnitOfMeasure = UnitOfMeasure.U,
+    var id: Long = 0
+    var name: String = ""
+    var unit: UnitOfMeasure = UnitOfMeasure.U
     var amount: Float = 0.0f
-)
+}

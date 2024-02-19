@@ -48,8 +48,8 @@ object DocumentsService {
 
     fun addEntry(documentId: Long, entry: Entry) {
         CoroutineScope(context!!).async {
-            MainActivity.database.entryDao().insert(entry)
-            MainActivity.database.documentEntryCrossRefDao().insert(DocumentEntryCrossRef(entry.id,documentId))
+            val entryId = MainActivity.database.entryDao().insert(entry)
+            MainActivity.database.documentEntryCrossRefDao().insert(DocumentEntryCrossRef(entryId,documentId))
         }
     }
 
