@@ -257,6 +257,7 @@ fun searchableExposedDropdownMenuBox(document: Document): Long {
                 value = selectedText,
                 onValueChange = { selectedText = it },
                 label = { Text(text = "Kontrahent") },
+                readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor()
             )

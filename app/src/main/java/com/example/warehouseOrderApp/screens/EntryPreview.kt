@@ -1,5 +1,6 @@
 package com.example.warehouseOrderApp.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -77,6 +78,9 @@ fun EntryPreview (documentId:Long, entryId:Long, navController: NavController){
                     )
                 }
             }
+        }
+        BackHandler(){
+            navController.popBackStack()
         }
     }
 

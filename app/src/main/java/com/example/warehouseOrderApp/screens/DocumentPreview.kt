@@ -241,7 +241,6 @@ fun UnitSelection(): UnitOfMeasure {
     Box(
         modifier = Modifier
             .padding(vertical = 12.dp)
-            .background(Color.Red)
     ) {
 
         ExposedDropdownMenuBox(
@@ -254,12 +253,13 @@ fun UnitSelection(): UnitOfMeasure {
                 value = selectedText,
                 onValueChange = { selectedText = it },
                 label = { Text(text = "Jednostka") },
+                readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor()
             )
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = {}
+                onDismissRequest = {},
             ) {
                 units.forEach() { item ->
                     DropdownMenuItem(
