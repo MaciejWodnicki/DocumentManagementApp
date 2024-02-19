@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -38,12 +39,16 @@ import com.example.warehouseOrderApp.src.data.Routes
 
 @Composable
 fun MainMenu(navController: NavController) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.inversePrimary)
+                    listOf(
+                        MaterialTheme.colorScheme.background,
+                        MaterialTheme.colorScheme.inversePrimary
+                    )
                 )
             )
             .padding(horizontal = 10.dp, vertical = 70.dp),
@@ -51,6 +56,7 @@ fun MainMenu(navController: NavController) {
         verticalArrangement = Arrangement.Bottom,
 
         ) {
+        
         MenuButton(text = "Kontrahenci", navController, Routes.Contractors.name)
         MenuButton(text = "Lista Dokumentów", navController, Routes.DocumentList.name)
     }
@@ -65,9 +71,9 @@ fun MenuButton(text: String, navController: NavController, destination: String) 
         shape = RoundedCornerShape(15.dp),
         contentPadding = PaddingValues(0.dp, 40.dp),
         modifier = Modifier
-            .padding(0.dp, 5.dp)
-            .fillMaxWidth()
-            .height(250.dp),
+            .padding(0.dp, 16.dp)
+            .width(300.dp)
+            .height(150.dp),
         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSecondary),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
 
