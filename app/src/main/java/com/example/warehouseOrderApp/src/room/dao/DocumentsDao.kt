@@ -1,4 +1,4 @@
-package com.example.warehouseOrderApp.src.room
+package com.example.warehouseOrderApp.src.room.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -28,8 +28,9 @@ interface DocumentsDao {
     fun getDocument(documentId:Long): Flow<Document>
 
     @Query("Select * From entry " +
-            "JOIN documententrycrossref on entryId = id " +
+            "JOIN documententrycrossref on entryId = entry_id " +
             "JOIN documents on document_id = documentId " +
             "WHERE documentId =:targetDocumentId")
     fun getEntries(targetDocumentId: Long): Flow<MutableList<Entry>>
+
 }

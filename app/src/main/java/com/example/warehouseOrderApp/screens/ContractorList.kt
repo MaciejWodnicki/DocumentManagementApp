@@ -2,6 +2,7 @@ package com.example.warehouseOrderApp.screens
 
 import android.R
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -75,10 +76,7 @@ fun ContractorList(navController: NavHostController) {
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            val currentContractorList: MutableList<Contractor>
-            runBlocking(Dispatchers.IO) {
-                currentContractorList = contractorService.listOfContractors().first()
-            }
+            val currentContractorList = contractorService.listOfContractors()
             itemsIndexed(currentContractorList) { index, item ->
                 Column(
                     modifier = Modifier,
@@ -106,7 +104,13 @@ fun ContractorListing(index: Long, navController: NavController) {
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                navController.navigate(
+                    "${Routes.ContractorEdit.name}/$index"
+                )
+
+            },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -114,17 +118,9 @@ fun ContractorListing(index: Long, navController: NavController) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = contractor.symbol)
         }
-        Button(
-            onClick = {
-                navController.navigate(
-                    "${Routes.ContractorEdit.name}/$index"
-                )
-            },
-        ) {
             Icon(
                 Icons.Rounded.Edit, contentDescription = stringResource(id = R.string.untitled)
             )
-        }
     }
     Row {
         Divider(color = MaterialTheme.colorScheme.primary)
@@ -144,9 +140,7 @@ fun ContractorEdit(
         contractor = Contractor()
     }
     else{
-        runBlocking(Dispatchers.IO) {
-            contractor = contractorService.get(index)
-        }
+        contractor = contractorService.get(index)
     }
 
     Column(

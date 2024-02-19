@@ -1,35 +1,77 @@
 package com.example.warehouseOrderApp.src.repositories
 
+import com.example.warehouseOrderApp.MainActivity
 import com.example.warehouseOrderApp.src.data.Document
-import java.time.LocalDate
+import com.example.warehouseOrderApp.src.data.DocumentEntryCrossRef
+import com.example.warehouseOrderApp.src.data.Entry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import kotlin.coroutines.CoroutineContext
 
 object DocumentsService {
-    private var documentList: MutableList<Document> = mutableListOf()
+    var context: CoroutineContext? = null
 
-    fun addDocument(symbol: String, date: LocalDate, contractorId: Long) {
-        var newDocument: Document = Document(symbol, date, contractorId)
+    fun provideCoroutineContext(coroutineContext: CoroutineContext) {
+        context = coroutineContext
+    }
 
-        if (!documentList.contains(newDocument)) {
-            documentList.add(newDocument)
+    fun addDocument(document: Document) {
+        runBlocking {
+            MainActivity.database.documentsDao().insert(document)
         }
     }
 
     fun listOfDocuments(): MutableList<Document> {
-        return documentList
+        val currentDocumentList: MutableList<Document>
+        runBlocking(Dispatchers.IO) {
+            currentDocumentList = MainActivity.database.documentsDao().getAllDocuments().first()
+        }
+        return currentDocumentList
     }
 
     fun get(index: Long): Document {
-        return documentList[index.toInt()]
+        var document: Document
+        runBlocking{
+            document = MainActivity.database.documentsDao().getDocument(index).first()
+        }
+        return document
     }
 
-    fun availableIndex(): Int {
-        val index: Int = documentList.size
-        documentList.add(index, Document(contractorId = 0))
-        return index
+    fun updateDocument(document: Document) {
+        CoroutineScope(context!!).async {
+            MainActivity.database.documentsDao().update(document)
+        }
     }
 
-    fun removeDocument(index: Long) {
-        documentList.removeAt(index.toInt())
+    fun addEntry(documentId: Long, entry: Entry) {
+        CoroutineScope(context!!).async {
+            MainActivity.database.entryDao().insert(entry)
+            MainActivity.database.documentEntryCrossRefDao().insert(DocumentEntryCrossRef(entry.id,documentId))
+        }
+    }
+
+    fun getDocumentEntries(documentId: Long): List<Entry> {
+        var entries: List<Entry>
+        runBlocking{
+            entries = MainActivity.database.entryDao().getDocumentEntries(documentId).first()
+        }
+        return entries
+    }
+
+    fun getEntry(entryId:Long): Entry{
+        var entry: Entry
+        runBlocking{
+            entry = MainActivity.database.entryDao().getEntry(entryId).first()
+        }
+        return entry
+    }
+    fun updateEntry(entry: Entry){
+        CoroutineScope(context!!).async{
+            MainActivity.database.entryDao().update(entry)
+        }
     }
 
 }

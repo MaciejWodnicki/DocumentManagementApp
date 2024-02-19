@@ -22,21 +22,21 @@ object ContractorsService {
     }
 
     fun addContractor(contractor: Contractor) {
-        CoroutineScope(context!!).async {
+        runBlocking {
             MainActivity.database.contractorDao().insert(contractor)
         }
-       // CoroutineScope(context!!).async {
-       //     MainActivity.database.contractorDao().insert(Contractor())
-       // }
     }
 
-    fun listOfContractors(): Flow<MutableList<Contractor>> {
-        return MainActivity.database.contractorDao().getAllContractors()
-
+    fun listOfContractors(): MutableList<Contractor> {
+        val currentContractorList: MutableList<Contractor>
+        runBlocking(Dispatchers.IO) {
+            currentContractorList = MainActivity.database.contractorDao().getAllContractors().first()
+        }
+        return currentContractorList
     }
 
     fun get(index: Long): Contractor {
-        var contractor: Contractor = Contractor()
+        var contractor: Contractor
         runBlocking{
             contractor = MainActivity.database.contractorDao().getContractor(index).first()
         }

@@ -9,6 +9,10 @@ import com.example.warehouseOrderApp.src.data.Contractor
 import com.example.warehouseOrderApp.src.data.Document
 import com.example.warehouseOrderApp.src.data.DocumentEntryCrossRef
 import com.example.warehouseOrderApp.src.data.Entry
+import com.example.warehouseOrderApp.src.room.dao.ContractorDao
+import com.example.warehouseOrderApp.src.room.dao.DocumentEntryCrossRefDao
+import com.example.warehouseOrderApp.src.room.dao.DocumentsDao
+import com.example.warehouseOrderApp.src.room.dao.EntryDao
 
 @TypeConverters(value = [DateConverter::class])
 @Database(
@@ -17,8 +21,10 @@ import com.example.warehouseOrderApp.src.data.Entry
     exportSchema = false
 )
 abstract class AppDatabase:RoomDatabase() {
-    abstract fun contractorDao():ContractorDao
-    abstract fun documentsDao():DocumentsDao
+    abstract fun contractorDao(): ContractorDao
+    abstract fun documentsDao(): DocumentsDao
+    abstract fun entryDao(): EntryDao
+    abstract fun documentEntryCrossRefDao(): DocumentEntryCrossRefDao
 
     companion object{
         @Volatile

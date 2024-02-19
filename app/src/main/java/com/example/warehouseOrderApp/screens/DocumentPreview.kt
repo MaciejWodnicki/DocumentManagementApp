@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,9 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.warehouseOrderApp.src.data.Entry
 import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.data.UnitOfMeasure
 import com.example.warehouseOrderApp.src.repositories.ContractorsService
@@ -57,7 +56,12 @@ private val contractorsService: ContractorsService = ContractorsService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentPreview(index: Long, navController: NavController) {
+fun DocumentPreview(documentId: Long, navController: NavController) {
+
+    val document = documentService.get(documentId)
+
+    val contractor = contractorsService.get(document.contractor)
+    val entries = documentService.getDocumentEntries(documentId)
 
     Scaffold(
         topBar = {
@@ -68,13 +72,14 @@ fun DocumentPreview(index: Long, navController: NavController) {
                 ),
                 title = {
                     Row (
-                        modifier = Modifier.fillMaxWidth().
-                        padding(end = 20.dp).
-                        clickable {
-                            navController.navigate(
-                                "${Routes.DocumentEdit.name}/$index"
-                            )
-                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 20.dp)
+                            .clickable {
+                                navController.navigate(
+                                    "${Routes.DocumentEdit.name}/$documentId"
+                                )
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween
                     ){
                         Text(text = "Dokument")
@@ -86,7 +91,7 @@ fun DocumentPreview(index: Long, navController: NavController) {
         floatingActionButton = {
             ExtendedFloatingActionButton(onClick = {
                 navController.navigate(
-                    "${Routes.EntryEdit.name}/$index/${documentService.get(index).availableIndex()}"
+                    "${Routes.EntryEdit.name}/$documentId/0"
                 )
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Dodaj towar")
@@ -99,14 +104,13 @@ fun DocumentPreview(index: Long, navController: NavController) {
                 .padding(innerPadding),
         ) {
             Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.padding(end = 20.dp)
+                horizontalArrangement = Arrangement.Start
             ) {
                 Column {
                     Text(
                         text = """
-                    Data: ${documentService.get(index).date.toString()}
-                    Symbol: ${documentService.get(index).symbol}
+                    Data: ${document.date.toString()}
+                    Symbol: ${document.symbol}
                     """
                     )
                 }
@@ -116,8 +120,8 @@ fun DocumentPreview(index: Long, navController: NavController) {
                         """
                     Kontrahent:
                     
-                    Nazwa: ${contractorsService.get(documentService.get(index).contractor).name}
-                    Symbol: ${contractorsService.get(documentService.get(index).contractor).symbol}
+                    Nazwa: ${contractor.name}
+                    Symbol: ${contractor.symbol}
                     
                     
                 """,
@@ -134,21 +138,21 @@ fun DocumentPreview(index: Long, navController: NavController) {
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
             {
-                itemsIndexed(documentService.get(index).getEntries()) { id, item ->
+                itemsIndexed(entries) { id, item ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 navController.navigate(
-                                    "${Routes.EntryPreview.name}/$index/$id"
+                                    "${Routes.EntryPreview.name}/${documentId}/${item.id}"
                                 )
                             }
                     ) {
                         Divider(Modifier.padding(top = 10.dp))
                         Text(
                             text = """
-                            Nazwa:    ${documentService.get(index).getEntries()[id].name}
-                            Ilość:    ${documentService.get(index).getEntries()[id].amount} ${documentService.get(index).getEntries()[id].unit}
+                            Nazwa:    ${item.name}
+                            Ilość:    ${item.amount} ${item.unit}
                         """.trimIndent()
                         )
                     }
@@ -159,16 +163,17 @@ fun DocumentPreview(index: Long, navController: NavController) {
 }
 
 @Composable
-fun EntryEdit(
-    index: Long, entryIndex: Long?,
-    navController: NavController,
+fun EntryEdit(documentID:Long?, entryId: Long?,
+              navController: NavController,
 ) {
 
-    if (index == null ||
-        entryIndex == null) return
-
-
-    val documentEntry = documentService.get(index).getEntries()[entryIndex.toInt()]
+    if(entryId == null || documentID == null) return
+    var entry: Entry
+    if(entryId == 0L){
+        entry = Entry()
+    }else{
+        entry = documentService.getEntry(entryId)
+    }
 
     Column(
         modifier = Modifier
@@ -177,7 +182,7 @@ fun EntryEdit(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        var name by remember { mutableStateOf(documentEntry.name) }
+        var name by remember { mutableStateOf(entry.name) }
 
         OutlinedTextField(
             value = name,
@@ -187,13 +192,13 @@ fun EntryEdit(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        var amount by remember { mutableStateOf(documentEntry.amount.toString()) }
+        var amount by remember { mutableStateOf(entry.amount.toString()) }
 
         OutlinedTextField(
             value = amount,
             onValueChange = { amount = it },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-            label = { Text(text = "Nazwa") },
+            label = { Text(text = "Ilość") },
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -202,12 +207,15 @@ fun EntryEdit(
 
         ElevatedButton(onClick = {
 
-            if (name == "") {
-                documentService.get(index).removeEntry(entryIndex.toInt())
-            } else {
-                documentService.get(index).getEntries()[entryIndex.toInt()].name = name
-                documentService.get(index).getEntries()[entryIndex.toInt()].amount = amount.toFloat()
-                documentService.get(index).getEntries()[entryIndex.toInt()].unit = unit
+            if (name != "") {
+                entry.name = name
+                entry.unit = unit
+                entry.amount = amount.toFloat()
+                if(entryId == 0L){
+                    documentService.addEntry(documentID,entry)
+                }else{
+                    documentService.updateEntry(entry)
+                }
             }
 
             navController.popBackStack()
@@ -215,9 +223,6 @@ fun EntryEdit(
             Text(text = "Zatwierdź")
         }
         BackHandler() {
-            if (name == "" || amount.toFloat() <=0.0f){
-                documentService.get(index).removeEntry(entryIndex.toInt())
-            }
             navController.popBackStack()
         }
     }

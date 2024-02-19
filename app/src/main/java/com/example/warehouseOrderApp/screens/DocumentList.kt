@@ -19,11 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,30 +41,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.warehouseOrderApp.src.data.Contractor
 import com.example.warehouseOrderApp.src.data.Document
 import com.example.warehouseOrderApp.src.data.Routes
 import com.example.warehouseOrderApp.src.repositories.ContractorsService
 import com.example.warehouseOrderApp.src.repositories.DocumentsService
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 
 private val documentService: DocumentsService = DocumentsService
@@ -78,6 +66,8 @@ private val addActionActive = false
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentList(navController: NavHostController) {
+
+    documentService.provideCoroutineContext(CoroutineName("Document list view context"))
 
     val addActionState = remember { mutableStateOf(addActionActive) }
     Scaffold(
@@ -117,7 +107,7 @@ fun DocumentList(navController: NavHostController) {
         }
         if (addActionState.value) {
             navController.navigate(
-                "${Routes.DocumentEdit.name}/${documentService.availableIndex()}"
+                "${Routes.DocumentEdit.name}/0"
             )
             addActionState.value = false
         }
@@ -130,26 +120,19 @@ fun DocumentListing(index: Long, navController: NavController) {
 
     val document = documentService.get(index)
 
-    val currentContractorList: MutableList<Contractor>
-    runBlocking(Dispatchers.IO) {
-        currentContractorList = contractorService.listOfContractors().first()
-    }
     Row(
         modifier = Modifier
             .padding(top = 16.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
             .fillMaxWidth()
             .clickable {
-                navController.navigate("${Routes.DocumentPreview.name}/$index")
+                navController.navigate("${Routes.DocumentPreview.name}/${document.id}")
             },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
             Text(text = document.symbol)
-            if (currentContractorList.size > document.contractor &&
-                document.contractor >= 0
-            ) {
-                Text(text = currentContractorList[document.contractor.toInt()].name)
-            }
+
+            Text(text = contractorService.get(document.contractor).name)
         }
 
         Text(text = document.date.toString())
@@ -160,16 +143,20 @@ fun DocumentListing(index: Long, navController: NavController) {
     }
 }
 
+//index = 0 -> add, index >= 1 ->update
 @Composable
 fun DocumentEdit(
     index: Long?,
     navController: NavController,
 ) {
-
-    if (index == null || index >= documentService.listOfDocuments().size) return
-
-
-    val document = documentService.get(index)
+    var document: Document
+    if (index == 0L) {
+        document = Document()
+    }
+    else
+    {
+        document = documentService.get(index!!)
+    }
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -200,14 +187,15 @@ fun DocumentEdit(
             )
 
         var contractorId by remember { mutableStateOf(document.contractor) }
-
         Row {
             contractorId = searchableExposedDropdownMenuBox(document)
             Button(
                 onClick = {
+
                     navController.navigate(
                         "${Routes.ContractorEdit.name}/${0}"
                     )
+
                 },
                 modifier = Modifier
                     .padding(vertical = 12.dp, horizontal = 4.dp)
@@ -223,27 +211,23 @@ fun DocumentEdit(
 
         ElevatedButton(onClick = {
 
-            if (symbol == "" || contractorId == null) {
-                documentService.removeDocument(index)
-            } else {
-                var parsedDate = document.date
-                try {
-                    parsedDate = LocalDate.parse(date)
-                    document.update(symbol, parsedDate, contractorId)
-                } catch (e: DateTimeParseException) {
-                    Toast.makeText(context, "Niepoprawna data", Toast.LENGTH_SHORT).show()
-                    documentService.removeDocument(index)
+            try {
+                val parsedDate = LocalDate.parse(date)
+                document.update(symbol, parsedDate, contractorId)
+                if(index == 0L){
+                    documentService.addDocument(document)
+                }else{
+                    documentService.updateDocument(document)
                 }
-
+                navController.popBackStack()
+            } catch (e: DateTimeParseException) {
+                Toast.makeText(context, "Niepoprawna data", Toast.LENGTH_SHORT).show()
             }
-            navController.popBackStack()
+
         }) {
             Text(text = "Confirm")
         }
         BackHandler() {
-            if (symbol == "" || contractorId == null) {
-                documentService.removeDocument(index)
-            }
             navController.popBackStack()
         }
     }
@@ -252,10 +236,7 @@ fun DocumentEdit(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun searchableExposedDropdownMenuBox(document: Document): Long {
-    val currentContractorList: MutableList<Contractor>
-    runBlocking(Dispatchers.IO) {
-        currentContractorList = contractorService.listOfContractors().first()
-    }
+    val currentContractorList = contractorService.listOfContractors()
 
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }

@@ -34,7 +34,9 @@ private val documentService: DocumentsService = DocumentsService
 private val contractorsService: ContractorsService = ContractorsService
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EntryPreview (documentIndex:Int, entryIndex:Int, navController: NavController){
+fun EntryPreview (documentId:Long, entryId:Long, navController: NavController){
+
+    val entry = documentService.getEntry(entryId)
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,7 +52,7 @@ fun EntryPreview (documentIndex:Int, entryIndex:Int, navController: NavControlle
         floatingActionButton = {
             ExtendedFloatingActionButton(onClick = {
                 navController.navigate(
-                    "${Routes.EntryEdit.name}/$documentIndex/$entryIndex"
+                    "${Routes.EntryEdit.name}/$documentId/$entryId"
                 )
             }) {
                 Icon(Icons.Default.Edit, contentDescription = "Edytuj")
@@ -69,8 +71,8 @@ fun EntryPreview (documentIndex:Int, entryIndex:Int, navController: NavControlle
                 Column {
                     Text(
                         text = """
-                    Nazwa Towaru: ${documentService.get(0).getEntries()[entryIndex].name}
-                    Symbol: ${documentService.get(0).getEntries()[entryIndex].amount} ${documentService.get(0).getEntries()[entryIndex].unit}
+                    Nazwa Towaru: ${entry.name}
+                    Symbol: ${entry.amount} ${entry.unit}
                     """
                     )
                 }

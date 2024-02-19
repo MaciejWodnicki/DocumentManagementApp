@@ -24,17 +24,6 @@ class Document(
 
     @ColumnInfo("document_contractor_id")
     var contractor: Long = contractorId
-    @Ignore
-    private var entryList: MutableList<Entry> = mutableListOf()
-
-
-    fun addEntry(entry: Entry) {
-        entryList.add(entry)
-    }
-
-    fun getEntries(): MutableList<Entry> {
-        return entryList
-    }
 
     fun update(
         documentSymbol: String = "",
@@ -46,13 +35,4 @@ class Document(
         contractor = contractorId
     }
 
-    fun removeEntry(index: Int) {
-        entryList.removeAt(index)
-    }
-
-    fun availableIndex(): Int {
-        val index: Int = entryList.size
-        entryList.add(index, Entry())
-        return index
-    }
 }

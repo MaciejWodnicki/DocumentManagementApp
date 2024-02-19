@@ -1,4 +1,4 @@
-package com.example.warehouseOrderApp.src.room
+package com.example.warehouseOrderApp.src.room.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

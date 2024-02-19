@@ -86,30 +86,29 @@ fun NavHostBuilder() {
             val index = it.arguments?.getLong("index")
             DocumentPreview(index!!, navController)
         }
-        composable(route = "${Routes.EntryEdit.name}/{index}/{entryIndex}",
-            arguments = listOf(navArgument("index") {
+        composable(route = "${Routes.EntryEdit.name}/{documentId}/{entryId}",
+            arguments = listOf(navArgument("documentId"){
                 type = NavType.LongType
-            },
-            navArgument("entryIndex"){
+            }, navArgument("entryId"){
                 type = NavType.LongType
             })
         ) {
-            val index = it.arguments?.getLong("index")
-            val entryIndex = it.arguments?.getLong("entryIndex")
-            EntryEdit(index!!, entryIndex, navController)
+            val documentId = it.arguments?.getLong("documentId")
+            val entryId = it.arguments?.getLong("entryId")
+            EntryEdit(documentId!!, entryId!!, navController)
         }
 
-        composable(route = "${Routes.EntryPreview.name}/{index}/{entryIndex}",
-            arguments = listOf(navArgument("index") {
-                type = NavType.LongType
-            },
-                navArgument("entryIndex"){
+        composable(route = "${Routes.EntryPreview.name}/{documentId}/{entryId}",
+            arguments = listOf(
+                navArgument("documentId"){
+                    type = NavType.LongType },
+                navArgument("entryId"){
                     type = NavType.LongType
                 })
         ) {
-            val index = it.arguments?.getInt("index")
-            val entryIndex = it.arguments?.getInt("entryIndex")
-            EntryPreview(index!!, entryIndex!!, navController)
+            val documentId = it.arguments?.getLong("documentId")
+            val entryId = it.arguments?.getLong("entryId")
+            EntryPreview(documentId!!, entryId!!, navController)
         }
     }
 }
