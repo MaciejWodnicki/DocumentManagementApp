@@ -25,4 +25,7 @@ interface ContractorDao {
 
     @Query("Select * FROM contractors WHERE contractor_id =:contractorId")
     fun getContractor(contractorId:Long): Flow<Contractor>
+
+    @Query("DELETE FROM Contractors")
+    fun ClearTable()
 }

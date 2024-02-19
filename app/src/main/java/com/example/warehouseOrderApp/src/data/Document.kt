@@ -11,7 +11,7 @@ import java.time.LocalDate
 class Document(
     documentSymbol: String = "",
     documentDate: LocalDate = LocalDate.of(2012, 12, 22),
-    contractorId: Int = -1,
+    contractorId: Long = 0,
 ) {
     @ColumnInfo("document_id")
     @PrimaryKey(autoGenerate = true)
@@ -23,7 +23,7 @@ class Document(
     var date: LocalDate = documentDate
 
     @ColumnInfo("document_contractor_id")
-    var contractor: Int = contractorId
+    var contractor: Long = contractorId
     @Ignore
     private var entryList: MutableList<Entry> = mutableListOf()
 
@@ -39,7 +39,7 @@ class Document(
     fun update(
         documentSymbol: String = "",
         documentDate: LocalDate = LocalDate.of(2012, 12, 22),
-        contractorId: Int = 0,
+        contractorId: Long,
     ) {
         symbol = documentSymbol
         date = documentDate

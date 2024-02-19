@@ -64,47 +64,47 @@ fun NavHostBuilder() {
         composable(
             route = "${Routes.ContractorEdit.name}/{index}",
             arguments = listOf(navArgument("index") {
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
-            val index = it.arguments?.getInt("index")
-            ContractorEdit(index, navController)
+            val index = it.arguments?.getLong("index")
+            ContractorEdit(index!!, navController)
         }
         composable(route = "${Routes.DocumentEdit.name}/{index}",
             arguments = listOf(navArgument("index") {
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
-            val index = it.arguments?.getInt("index")
+            val index = it.arguments?.getLong("index")
             DocumentEdit(index, navController)
         }
         composable(route = "${Routes.DocumentPreview.name}/{index}",
             arguments = listOf(navArgument("index") {
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
-            val index = it.arguments?.getInt("index")
+            val index = it.arguments?.getLong("index")
             DocumentPreview(index!!, navController)
         }
         composable(route = "${Routes.EntryEdit.name}/{index}/{entryIndex}",
             arguments = listOf(navArgument("index") {
-                type = NavType.IntType
+                type = NavType.LongType
             },
             navArgument("entryIndex"){
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
-            val index = it.arguments?.getInt("index")
-            val entryIndex = it.arguments?.getInt("entryIndex")
-            EntryEdit(index, entryIndex, navController)
+            val index = it.arguments?.getLong("index")
+            val entryIndex = it.arguments?.getLong("entryIndex")
+            EntryEdit(index!!, entryIndex, navController)
         }
 
         composable(route = "${Routes.EntryPreview.name}/{index}/{entryIndex}",
             arguments = listOf(navArgument("index") {
-                type = NavType.IntType
+                type = NavType.LongType
             },
                 navArgument("entryIndex"){
-                    type = NavType.IntType
+                    type = NavType.LongType
                 })
         ) {
             val index = it.arguments?.getInt("index")

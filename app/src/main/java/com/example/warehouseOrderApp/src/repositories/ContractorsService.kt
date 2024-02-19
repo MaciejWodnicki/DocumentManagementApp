@@ -4,22 +4,30 @@ import android.content.Context
 import com.example.warehouseOrderApp.MainActivity
 import com.example.warehouseOrderApp.src.data.Contractor
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 
 object ContractorsService {
-    private var contractorList: MutableList<Contractor> = mutableListOf()
     var context: CoroutineContext? = null
 
-    fun provideCoroutineContext(coroutineContext: CoroutineContext){
+    fun provideCoroutineContext(coroutineContext: CoroutineContext) {
         context = coroutineContext
     }
-    fun addContractor(contractor: Contractor?) {
-        if (contractor == null)
-            return
-        contractorList.add(contractor)
+
+    fun addContractor(contractor: Contractor) {
+        CoroutineScope(context!!).async {
+            MainActivity.database.contractorDao().insert(contractor)
+        }
+       // CoroutineScope(context!!).async {
+       //     MainActivity.database.contractorDao().insert(Contractor())
+       // }
     }
 
     fun listOfContractors(): Flow<MutableList<Contractor>> {
@@ -27,21 +35,25 @@ object ContractorsService {
 
     }
 
-    fun get(index: Int): Contractor {
-        return contractorList[index]
-    }
-
-    fun availableIndex(context: CoroutineContext): Int {
-        val index: Int = contractorList.size
-         CoroutineScope(context).async{
-            MainActivity.database.contractorDao().insert(Contractor())
+    fun get(index: Long): Contractor {
+        var contractor: Contractor = Contractor()
+        runBlocking{
+            contractor = MainActivity.database.contractorDao().getContractor(index).first()
         }
-        contractorList.add(index, Contractor())
-        return index
+        return contractor
     }
 
-    fun removeContractor(index: Int) {
-        contractorList.removeAt(index)
+
+    fun removeContractor(contractor: Contractor) {
+        CoroutineScope(context!!).async {
+            MainActivity.database.contractorDao().delete(contractor)
+        }
+    }
+
+    fun updateContractor(contractor: Contractor) {
+        CoroutineScope(context!!).async {
+            MainActivity.database.contractorDao().update(contractor)
+        }
     }
 
 }

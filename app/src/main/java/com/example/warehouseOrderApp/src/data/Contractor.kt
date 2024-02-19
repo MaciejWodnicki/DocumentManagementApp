@@ -5,18 +5,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "Contractors")
-class Contractor(symbol: String = "", name: String = "") {
+class Contractor(
+    @ColumnInfo("contractor_symbol") var symbol: String = "",
+    @ColumnInfo("contractor_name") var name: String = ""
+) {
 
     @ColumnInfo("contractor_id")
     @PrimaryKey(autoGenerate = true)
     var id:Long = 0
-
-    @ColumnInfo("contractor_symbol")
-    var symbol = symbol
-        private set
-    @ColumnInfo("contractor_name")
-    var name = name
-        private set
 
 
     fun updateContractor(contractorSymbol: String = symbol, contractorName: String = name) {

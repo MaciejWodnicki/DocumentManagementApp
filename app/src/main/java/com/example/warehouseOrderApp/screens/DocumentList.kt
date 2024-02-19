@@ -110,7 +110,7 @@ fun DocumentList(navController: NavHostController) {
                 Column(
                     modifier = Modifier,
                 ) {
-                    DocumentListing(index, navController)
+                    DocumentListing(item.id, navController)
                 }
             }
 
@@ -126,7 +126,7 @@ fun DocumentList(navController: NavHostController) {
 }
 
 @Composable
-fun DocumentListing(index: Int, navController: NavController) {
+fun DocumentListing(index: Long, navController: NavController) {
 
     val document = documentService.get(index)
 
@@ -148,7 +148,7 @@ fun DocumentListing(index: Int, navController: NavController) {
             if (currentContractorList.size > document.contractor &&
                 document.contractor >= 0
             ) {
-                Text(text = currentContractorList[document.contractor].name)
+                Text(text = currentContractorList[document.contractor.toInt()].name)
             }
         }
 
@@ -162,7 +162,7 @@ fun DocumentListing(index: Int, navController: NavController) {
 
 @Composable
 fun DocumentEdit(
-    index: Int?,
+    index: Long?,
     navController: NavController,
 ) {
 
@@ -206,7 +206,7 @@ fun DocumentEdit(
             Button(
                 onClick = {
                     navController.navigate(
-                        "${Routes.ContractorEdit.name}/${contractorService.availableIndex(CoroutineName("Document View Context"))}"
+                        "${Routes.ContractorEdit.name}/${0}"
                     )
                 },
                 modifier = Modifier
@@ -223,7 +223,7 @@ fun DocumentEdit(
 
         ElevatedButton(onClick = {
 
-            if (symbol == "" || contractorId == -1) {
+            if (symbol == "" || contractorId == null) {
                 documentService.removeDocument(index)
             } else {
                 var parsedDate = document.date
@@ -241,7 +241,7 @@ fun DocumentEdit(
             Text(text = "Confirm")
         }
         BackHandler() {
-            if (symbol == "" || contractorId == -1) {
+            if (symbol == "" || contractorId == null) {
                 documentService.removeDocument(index)
             }
             navController.popBackStack()
@@ -251,7 +251,7 @@ fun DocumentEdit(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun searchableExposedDropdownMenuBox(document: Document): Int {
+fun searchableExposedDropdownMenuBox(document: Document): Long {
     val currentContractorList: MutableList<Contractor>
     runBlocking(Dispatchers.IO) {
         currentContractorList = contractorService.listOfContractors().first()
@@ -260,7 +260,7 @@ fun searchableExposedDropdownMenuBox(document: Document): Int {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }
 
-    var contractorId: Int by remember { mutableStateOf(document.contractor) }
+    var contractorId: Long by remember { mutableStateOf(document.contractor) }
 
     Box(
         modifier = Modifier
@@ -289,7 +289,7 @@ fun searchableExposedDropdownMenuBox(document: Document): Int {
                         onClick = {
                             selectedText = "${item.name}, ${item.symbol}"
                             expanded = false
-                            contractorId = index
+                            contractorId = item.id
                         }
                     )
                 }

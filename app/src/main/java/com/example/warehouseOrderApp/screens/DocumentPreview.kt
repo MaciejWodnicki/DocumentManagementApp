@@ -57,7 +57,7 @@ private val contractorsService: ContractorsService = ContractorsService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentPreview(index: Int, navController: NavController) {
+fun DocumentPreview(index: Long, navController: NavController) {
 
     Scaffold(
         topBar = {
@@ -160,16 +160,15 @@ fun DocumentPreview(index: Int, navController: NavController) {
 
 @Composable
 fun EntryEdit(
-    index: Int?, entryIndex: Int?,
+    index: Long, entryIndex: Long?,
     navController: NavController,
 ) {
 
-    if (index == null || index >= documentService.listOfDocuments().size ||
-        entryIndex == null || entryIndex >= documentService.get(index).getEntries().size
-    ) return
+    if (index == null ||
+        entryIndex == null) return
 
 
-    val documentEntry = documentService.get(index).getEntries()[entryIndex]
+    val documentEntry = documentService.get(index).getEntries()[entryIndex.toInt()]
 
     Column(
         modifier = Modifier
@@ -204,11 +203,11 @@ fun EntryEdit(
         ElevatedButton(onClick = {
 
             if (name == "") {
-                documentService.get(index).removeEntry(entryIndex)
+                documentService.get(index).removeEntry(entryIndex.toInt())
             } else {
-                documentService.get(index).getEntries()[entryIndex].name = name
-                documentService.get(index).getEntries()[entryIndex].amount = amount.toFloat()
-                documentService.get(index).getEntries()[entryIndex].unit = unit
+                documentService.get(index).getEntries()[entryIndex.toInt()].name = name
+                documentService.get(index).getEntries()[entryIndex.toInt()].amount = amount.toFloat()
+                documentService.get(index).getEntries()[entryIndex.toInt()].unit = unit
             }
 
             navController.popBackStack()
@@ -217,7 +216,7 @@ fun EntryEdit(
         }
         BackHandler() {
             if (name == "" || amount.toFloat() <=0.0f){
-                documentService.get(index).removeEntry(entryIndex)
+                documentService.get(index).removeEntry(entryIndex.toInt())
             }
             navController.popBackStack()
         }

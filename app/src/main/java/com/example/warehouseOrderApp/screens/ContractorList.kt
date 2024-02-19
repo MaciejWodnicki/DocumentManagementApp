@@ -1,9 +1,7 @@
 package com.example.warehouseOrderApp.screens
 
 import android.R
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,8 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -39,8 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -59,6 +53,7 @@ private val contractorService: ContractorsService = ContractorsService
 @Composable
 fun ContractorList(navController: NavHostController) {
 
+    ContractorsService.provideCoroutineContext(CoroutineName("Contractor list view context"))
     val addActionState = remember { mutableStateOf(addActionActive) }
 
     Scaffold(topBar = {
@@ -88,14 +83,14 @@ fun ContractorList(navController: NavHostController) {
                 Column(
                     modifier = Modifier,
                 ) {
-                    ContractorListing(index, navController)
+                    ContractorListing(item.id, navController)
                 }
             }
 
         }
         if (addActionState.value) {
             navController.navigate(
-                "${Routes.ContractorEdit.name}/${contractorService.availableIndex(CoroutineName("Contractors view context"))}"
+                "${Routes.ContractorEdit.name}/0"
             )
             addActionState.value = false
         }
@@ -104,14 +99,10 @@ fun ContractorList(navController: NavHostController) {
 }
 
 @Composable
-fun ContractorListing(index: Int, navController: NavController) {
+fun ContractorListing(index: Long, navController: NavController) {
 
-    val contractor:Contractor
-    try {
-        contractor = ContractorsService.get(index)
-    }catch (exception: IndexOutOfBoundsException){
-        return
-    }
+    val contractor = ContractorsService.get(index)
+
     Row(
         modifier = Modifier
             .padding(all = 8.dp)
@@ -141,19 +132,23 @@ fun ContractorListing(index: Int, navController: NavController) {
 
 }
 
+//index = 0 -> add, index >= 1 ->update
 @Composable
 fun ContractorEdit(
-    index: Int?,
+    index: Long,
     navController: NavController,
 ) {
-    val currentContractorList: MutableList<Contractor>
-    runBlocking(Dispatchers.IO) {
-        currentContractorList = contractorService.listOfContractors().first()
+    val contractor: Contractor
+    if(index == 0L)
+    {
+        contractor = Contractor()
     }
-    if (index == null || index >= currentContractorList.size) return
+    else{
+        runBlocking(Dispatchers.IO) {
+            contractor = contractorService.get(index)
+        }
+    }
 
-
-    val contractor = contractorService.get(index)
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 40.dp)
@@ -177,10 +172,15 @@ fun ContractorEdit(
         Spacer(modifier = Modifier.height(20.dp))
 
         ElevatedButton(onClick = {
-            if (symbol == "" || name == "") {
-                contractorService.removeContractor(index)
-            } else {
+
+            if(symbol!= "" && name != "")
+            {
                 contractor.updateContractor(symbol, name)
+                if(index == 0L){
+                    contractorService.addContractor(contractor)
+                }
+
+                contractorService.updateContractor(contractor)
             }
             navController.popBackStack()
         }) {
@@ -188,9 +188,7 @@ fun ContractorEdit(
         }
 
         BackHandler() {
-            if (symbol == "" || name == "") {
-                contractorService.removeContractor(index)
-            }
+
             navController.popBackStack()
         }
     }

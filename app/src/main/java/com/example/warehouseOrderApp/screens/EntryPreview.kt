@@ -69,8 +69,8 @@ fun EntryPreview (documentIndex:Int, entryIndex:Int, navController: NavControlle
                 Column {
                     Text(
                         text = """
-                    Nazwa Towaru: ${documentService.get(documentIndex).getEntries()[entryIndex].name}
-                    Symbol: ${documentService.get(documentIndex).getEntries()[entryIndex].amount} ${documentService.get(documentIndex).getEntries()[entryIndex].unit}
+                    Nazwa Towaru: ${documentService.get(0).getEntries()[entryIndex].name}
+                    Symbol: ${documentService.get(0).getEntries()[entryIndex].amount} ${documentService.get(0).getEntries()[entryIndex].unit}
                     """
                     )
                 }
